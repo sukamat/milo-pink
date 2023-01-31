@@ -334,4 +334,12 @@ async function updateProjectWithDocs(projectDetail) {
 }
 
 // eslint-disable-next-line import/prefer-default-export
-export { init, updateProjectWithDocs, PROJECT_STATUS, PROJECTS_ROOT_PATH };
+export {
+  init,
+  updateProjectWithDocs,
+  getHelixAdminApiUrl,
+  getProjectFileStatus,
+  readProjectFile,
+  PROJECT_STATUS,
+  PROJECTS_ROOT_PATH
+};
