@@ -10,17 +10,50 @@ import {
   getHelixAdminApiUrl,
   readProjectFile,
 } from '../../loc/project.js';
+import {
+  getSpFiles,
+} from '../../loc/sharepoint.js';
+import {
+  getFloodgateUrl,
+} from './utils.js';
 
 let project;
 let projectDetail;
 
-function getFloodgateUrl(url) {
-  if (!url) {
-    return undefined;
+function injectSharepointData(filePaths, docPaths, spBatchFiles, isFloodgate) {
+  spBatchFiles.forEach((spFiles) => {
+    if (spFiles && spFiles.responses) {
+      spFiles.responses.forEach((file) => {
+        const filePath = docPaths[file.id];
+        const spFileStatus = file.status;
+        const fileBody = spFileStatus === 200 ? file.body : {};
+        const urls = filePaths.get(filePath);
+        const urlsObjectInProjDetail = projectDetail['urls'];
+        urls.forEach((key) => {
+          const urlObjVal = urlsObjectInProjDetail.get(key);
+          if (isFloodgate) {
+            urlObjVal.doc.fg.sp = fileBody;
+            urlObjVal.doc.fg.sp.status = spFileStatus;
+          } else {
+            urlObjVal.doc.sp = fileBody;
+            urlObjVal.doc.sp.status = spFileStatus;
+          }
+        });
+      });
+    }
+  });
+}
+
+async function updateProjectWithDocs(projectDetail) {
+  if (!projectDetail || !projectDetail?.filePaths) {
+    return;
   }
-  let urlArr = url.split('--');
-  urlArr[1] += '-pink';
-  return urlArr.join('--');
+  const { filePaths } = projectDetail;
+  const docPaths = [...filePaths.keys()];
+  const spBatchFiles = await getSpFiles(docPaths);
+  injectSharepointData(filePaths, docPaths, spBatchFiles);
+  const fgSpBatchFiles = await getSpFiles(docPaths, true);
+  injectSharepointData(filePaths, docPaths, fgSpBatchFiles, true);
 }
 
 async function initProject() {
@@ -59,7 +92,7 @@ async function initProject() {
     owner: urlInfo.owner,
     repo: urlInfo.repo,
     ref: urlInfo.ref,
-    async getDetail() {
+    async getDetails() {
       const projectFileJson = await readProjectFile(projectUrl);
       if (!projectFileJson) {
         return {};
@@ -77,16 +110,15 @@ async function initProject() {
             url: url,
             fg: {
               url: getFloodgateUrl(url),
-              sp: {},
             },
           }
         });
+        // Add urls data to map
         if (filePaths.has(docPath)) {
-          map.get(docPath).push(url);
+          filePaths.get(docPath).push(url);
         } else {
-          map.set(docPath, [url]);
+          filePaths.set(docPath, [url]);
         }
-        //addOrAppendToMap(filePaths, docPath, `urls|${url}|doc`);
       });
 
       projectDetail = {
@@ -106,4 +138,5 @@ async function initProject() {
 
 export {
   initProject,
+  updateProjectWithDocs,
 }

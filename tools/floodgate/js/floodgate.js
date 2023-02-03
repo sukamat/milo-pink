@@ -10,9 +10,15 @@ import {
 } from '../../loc/sharepoint.js';
 import {
   initProject,
+  updateProjectWithDocs,
 } from './project.js';
+import {
+  updateProjectInfo,
+  updateProjectDetailsUI,
+} from './app.js';
 
 let project;
+let projectDetail;
 
 function startProject() {
 
@@ -38,6 +44,17 @@ function setListeners() {
   document.querySelector('#loading').addEventListener('click', loadingOFF);
 }
 
+async function displayProjectDetail() {
+  if (!projectDetail) {
+    return;
+  }
+  const config = await getConfig();
+  if (!config) {
+    return;
+  }
+  updateProjectDetailsUI(projectDetail, config);
+}
+
 async function init() {
 
   try {
@@ -52,7 +69,17 @@ async function init() {
 
     loadingON('Fetching Project Config...');
     project = await initProject();
-    loadingON('Refreshing Project Config...');
+    console.log(`project.url: ${project.url}`);
+    console.log(`project.path: ${project.path}`);
+    console.log(`project.name: ${project.name}`);
+    console.log(`project.excelPath: ${project.excelPath}`);
+    loadingON(`Fetching project details for ${project.url}`);
+
+    // Update project name
+    updateProjectInfo(project);
+
+    projectDetail = await project.getDetails();
+    loadingON('Project Details loaded...');
 
     loadingON('Connecting now to Sharepoint...');
     const connectedToSp = await connectToSP();
@@ -60,7 +87,16 @@ async function init() {
       loadingON('Could not connect to sharepoint...');
       return;
     }
-    loadingON('Connected to Sharepoint! Updating the Sharepoint Status...');
+    loadingON('Connected to Sharepoint!');
+
+    loadingON('Updating Project the Sharepoint Docs Data...');
+    await updateProjectWithDocs(projectDetail);
+
+    loadingON('Updating UI..');
+    await displayProjectDetail();
+    loadingON('UI updated..');
+    loadingOFF();
+
   } catch (error) {
     loadingON(`Error occurred when initializing the Floodgate project ${error.message}`);
   }
