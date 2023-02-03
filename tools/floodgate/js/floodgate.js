@@ -21,19 +21,19 @@ let project;
 let projectDetail;
 
 function startProject() {
-
+  // TODO: 
 }
 
 function copyFilesToFloodgateTree() {
-
+  // TODO: 
 }
 
 function promoteFilesToFloodgateTree() {
-
+  // TODO: 
 }
 
 function deleteFloodgateTree() {
-
+  // TODO: 
 }
 
 function setListeners() {
@@ -58,8 +58,10 @@ async function displayProjectDetail() {
 async function init() {
 
   try {
+    // Set the listeners on the floodgate action buttons
     setListeners();
 
+    // Read the Floodgate Sharepoint Config
     loadingON('Fetching Floodgate Config...');
     const config = await getConfig();
     if (!config) {
@@ -67,17 +69,15 @@ async function init() {
     }
     loadingON('Floodgate Config loaded...');
 
+    // Initialize the Floodgate Project by setting the required project info
     loadingON('Fetching Project Config...');
     project = await initProject();
-    console.log(`project.url: ${project.url}`);
-    console.log(`project.path: ${project.path}`);
-    console.log(`project.name: ${project.name}`);
-    console.log(`project.excelPath: ${project.excelPath}`);
     loadingON(`Fetching project details for ${project.url}`);
 
-    // Update project name
+    // Update project name on the admin page
     updateProjectInfo(project);
 
+    // Read the project excel file and parse the data
     projectDetail = await project.getDetails();
     loadingON('Project Details loaded...');
 
@@ -89,18 +89,18 @@ async function init() {
     }
     loadingON('Connected to Sharepoint!');
 
-    loadingON('Updating Project the Sharepoint Docs Data...');
+    // Inject Sharepoint file metadata
+    loadingON('Updating Project with the Sharepoint Docs Data...');
     await updateProjectWithDocs(projectDetail);
 
+    // Render the data on the page
     loadingON('Updating UI..');
     await displayProjectDetail();
     loadingON('UI updated..');
     loadingOFF();
-
   } catch (error) {
     loadingON(`Error occurred when initializing the Floodgate project ${error.message}`);
   }
-
 }
 
 export default init;

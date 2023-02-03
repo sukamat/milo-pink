@@ -66,22 +66,16 @@ async function initProject() {
 
   // helix API to get the details/status of the file
   const hlxAdminStatusUrl = getHelixAdminApiUrl(urlInfo, config.admin.api.status.baseURI);
-  console.log(`hlxAdminStatusUrl: ${hlxAdminStatusUrl}`);
 
   // get the status of the project file
   const projectFileStatus = await getProjectFileStatus(hlxAdminStatusUrl, urlInfo.sp);
   if (!projectFileStatus || !projectFileStatus?.webPath) {
     throw new Error('Project file does not have valid web path');
   }
-  console.log('projectFileStatus :: ');
-  console.log(projectFileStatus);
 
   const projectPath = projectFileStatus.webPath;
-  console.log(`projectPath: ${projectPath}`);
   const projectUrl = `${urlInfo.origin}${projectPath}`;
-  console.log(`projectUrl: ${projectUrl}`);
   const projectName = projectFileStatus.edit.name;
-  console.log(`projectName: ${projectName}`);
 
   project = {
     url: projectUrl,
