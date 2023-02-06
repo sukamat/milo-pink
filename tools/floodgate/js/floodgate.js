@@ -20,27 +20,12 @@ import {
 let project;
 let projectDetail;
 
-function startProject() {
-  // TODO: 
-}
-
 function copyFilesToFloodgateTree() {
   // TODO: 
 }
 
-function promoteFilesToFloodgateTree() {
-  // TODO: 
-}
-
-function deleteFloodgateTree() {
-  // TODO: 
-}
-
 function setListeners() {
-  document.querySelector('#startProject button').addEventListener('click', startProject);
   document.querySelector('#copyFiles button').addEventListener('click', copyFilesToFloodgateTree);
-  document.querySelector('#promoteFiles button').addEventListener('click', promoteFilesToFloodgateTree);
-  document.querySelector('#deleteFiles button').addEventListener('click', deleteFloodgateTree);
   document.querySelector('#loading').addEventListener('click', loadingOFF);
 }
 

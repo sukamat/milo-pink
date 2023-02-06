@@ -119,7 +119,7 @@ function updateProjectDetailsUI(projectDetail, config) {
 
   container.appendChild($table);
 
-  const showIds = ['startProject', 'copyFiles', 'promoteFiles', 'deleteFiles'];
+  const showIds = ['copyFiles'];
   showButtons(showIds);
 }
 
