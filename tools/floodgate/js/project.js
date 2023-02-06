@@ -59,18 +59,22 @@ async function updateProjectWithDocs(projectDetail) {
   injectSharepointData(filePaths, docPaths, fgSpBatchFiles, true);
 }
 
-async function fetchProjectFile(url, retryAttempt) {
+async function getProjectFile(url, retryAttempt) {
   const response = await fetch(url);
   if (!response.ok && retryAttempt <= MAX_RETRIES) {
-    await fetchProjectFile(url, retryAttempt + 1);
+    await getProjectFile(url, retryAttempt + 1);
   }
   return response;
 }
 
-async function reloadProjectFile() {
+/**
+ * Purge project file from cache and reload it to pick-up the latest changes.
+ */
+async function purgeAndReloadProjectFile() {
   const projectFile = await initProject();
   await projectFile.purge();
-  await fetchProjectFile(projectFile.url, 1);
+  await getProjectFile(projectFile.url, 1);
+  window.location.reload();
 }
 
 async function initProject() {
@@ -154,5 +158,5 @@ async function initProject() {
 export {
   initProject,
   updateProjectWithDocs,
-  reloadProjectFile,
+  purgeAndReloadProjectFile,
 }

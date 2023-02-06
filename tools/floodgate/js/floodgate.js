@@ -11,19 +11,16 @@ import {
 import {
   initProject,
   updateProjectWithDocs,
-  reloadProjectFile,
+  purgeAndReloadProjectFile,
 } from './project.js';
 import {
   updateProjectInfo,
   updateProjectDetailsUI,
 } from './app.js';
 
-/**
- * Purge project file from cache and reload it to pick-up the latest changes.
- */
 async function reloadProject() {
-  await reloadProjectFile();
-  window.location.reload();
+  loadingON('Purging project file cache and reloading... please wait');
+  await purgeAndReloadProjectFile();
 }
 
 function setListeners() {
