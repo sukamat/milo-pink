@@ -11,33 +11,24 @@ import {
 import {
   initProject,
   updateProjectWithDocs,
+  reloadProjectFile,
 } from './project.js';
 import {
   updateProjectInfo,
   updateProjectDetailsUI,
 } from './app.js';
 
-let project;
-let projectDetail;
-
-function copyFilesToFloodgateTree() {
-  // TODO: 
+/**
+ * Purge project file from cache and reload it to pick-up the latest changes.
+ */
+async function reloadProject() {
+  await reloadProjectFile();
+  window.location.reload();
 }
 
 function setListeners() {
-  document.querySelector('#copyFiles button').addEventListener('click', copyFilesToFloodgateTree);
+  document.querySelector('#reloadProject button').addEventListener('click', reloadProject);
   document.querySelector('#loading').addEventListener('click', loadingOFF);
-}
-
-async function displayProjectDetail() {
-  if (!projectDetail) {
-    return;
-  }
-  const config = await getConfig();
-  if (!config) {
-    return;
-  }
-  updateProjectDetailsUI(projectDetail, config);
 }
 
 async function init() {
@@ -56,14 +47,14 @@ async function init() {
 
     // Initialize the Floodgate Project by setting the required project info
     loadingON('Fetching Project Config...');
-    project = await initProject();
+    const project = await initProject();
     loadingON(`Fetching project details for ${project.url}`);
 
     // Update project name on the admin page
     updateProjectInfo(project);
 
     // Read the project excel file and parse the data
-    projectDetail = await project.getDetails();
+    const projectDetail = await project.getDetails();
     loadingON('Project Details loaded...');
 
     loadingON('Connecting now to Sharepoint...');
@@ -80,7 +71,7 @@ async function init() {
 
     // Render the data on the page
     loadingON('Updating UI..');
-    await displayProjectDetail();
+    await updateProjectDetailsUI(projectDetail, config);
     loadingON('UI updated..');
     loadingOFF();
   } catch (error) {

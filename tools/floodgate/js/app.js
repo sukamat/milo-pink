@@ -87,9 +87,12 @@ function showButtons(buttonIds) {
   });
 }
 
-function updateProjectDetailsUI(projectDetail, config) {
-  const container = getProjectDetailContainer();
+async function updateProjectDetailsUI(projectDetail, config) {
+  if (!projectDetail || !config) {
+    return;
+  }
 
+  const container = getProjectDetailContainer();
   const $table = createTableWithHeaders();
   const spViewUrl = config.sp.shareUrl;
   const fgSpViewUrl = config.sp.fgShareUrl;
@@ -119,7 +122,7 @@ function updateProjectDetailsUI(projectDetail, config) {
 
   container.appendChild($table);
 
-  const showIds = ['copyFiles'];
+  const showIds = ['reloadProject'];
   showButtons(showIds);
 }
 

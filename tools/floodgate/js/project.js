@@ -20,6 +20,9 @@ import {
 let project;
 let projectDetail;
 
+/**
+ * Makes the sharepoint file data part of `projectDetail` per URL.
+ */
 function injectSharepointData(filePaths, docPaths, spBatchFiles, isFloodgate) {
   spBatchFiles.forEach((spFiles) => {
     if (spFiles && spFiles.responses) {
@@ -56,6 +59,20 @@ async function updateProjectWithDocs(projectDetail) {
   injectSharepointData(filePaths, docPaths, fgSpBatchFiles, true);
 }
 
+async function fetchProjectFile(url, retryAttempt) {
+  const response = await fetch(url);
+  if (!response.ok && retryAttempt <= MAX_RETRIES) {
+    await fetchProjectFile(url, retryAttempt + 1);
+  }
+  return response;
+}
+
+async function reloadProjectFile() {
+  const projectFile = await initProject();
+  await projectFile.purge();
+  await fetchProjectFile(projectFile.url, 1);
+}
+
 async function initProject() {
   if (project) return project;
   const config = await getConfig();
@@ -86,6 +103,10 @@ async function initProject() {
     owner: urlInfo.owner,
     repo: urlInfo.repo,
     ref: urlInfo.ref,
+    purge() {
+      const hlxAdminPreviewUrl = getHelixAdminApiUrl(urlInfo, config.admin.api.preview.baseURI);
+      return fetch(`${hlxAdminPreviewUrl}${projectPath}`, { method: 'POST' });
+    },
     async getDetails() {
       const projectFileJson = await readProjectFile(projectUrl);
       if (!projectFileJson) {
@@ -133,4 +154,5 @@ async function initProject() {
 export {
   initProject,
   updateProjectWithDocs,
+  reloadProjectFile,
 }
