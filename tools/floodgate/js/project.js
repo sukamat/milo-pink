@@ -124,29 +124,13 @@ async function initProject() {
         const url = urlRow.URL;
         const docPath = getDocPathFromUrl(url);
         urls.set(url, {
-          doc: {
-            filePath: docPath,
-            url: url,
-            fg: {
-              url: getFloodgateUrl(url),
-            },
-          }
+          doc: { filePath: docPath, url: url, fg: { url: getFloodgateUrl(url), }, }
         });
-        // Add urls data to map
-        if (filePaths.has(docPath)) {
-          filePaths.get(docPath).push(url);
-        } else {
-          filePaths.set(docPath, [url]);
-        }
+        // Add urls data to filePaths map
+        filePaths.has(docPath) ? filePaths.get(docPath).push(url) : filePaths.set(docPath, [url]);
       });
 
-      projectDetail = {
-        url: projectUrl,
-        name: projectName,
-        urls,
-        filePaths,
-      };
-
+      projectDetail = { url: projectUrl, name: projectName, urls, filePaths, };
       window.projectDetail = projectDetail;
       return projectDetail;
 
