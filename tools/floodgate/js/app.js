@@ -8,16 +8,6 @@ function updateProjectInfo(project) {
   document.getElementById('project-url').innerHTML = `<a href='${project.sp}' title='${project.excelPath}'>${project.name}</a>`;
 }
 
-function getProjectDetailContainer() {
-  const container = document.getElementsByClassName('project-detail')[0];
-  container.innerHTML = '';
-  return container;
-}
-
-function createRow(classValue = 'default') {
-  return createTag('tr', { class: `${classValue}` });
-}
-
 function createColumn(innerHtml, classValue) {
   const tag = classValue === 'header' ? 'th' : 'td';
   const element = document.createElement(tag);
@@ -27,19 +17,15 @@ function createColumn(innerHtml, classValue) {
   return element;
 }
 
-function createHeaderColumn(innerHtml) {
-  return createColumn(innerHtml, 'header');
-}
-
 function createTableWithHeaders() {
   const $table = createTag('table');
-  const $tr = createRow('header');
-  $tr.appendChild(createHeaderColumn('Source URL'));
-  $tr.appendChild(createHeaderColumn('Source File'));
-  $tr.appendChild(createHeaderColumn('Source File Info'));
-  $tr.appendChild(createHeaderColumn('Floodgated URL'));
-  $tr.appendChild(createHeaderColumn('Floodgated File'));
-  $tr.appendChild(createHeaderColumn('Floodgated File Info'));
+  const $tr = createTag('tr', { class: 'header' });
+  $tr.appendChild(createColumn('Source URL', 'header'));
+  $tr.appendChild(createColumn('Source File', 'header'));
+  $tr.appendChild(createColumn('Source File Info', 'header'));
+  $tr.appendChild(createColumn('Floodgated URL', 'header'));
+  $tr.appendChild(createColumn('Floodgated File', 'header'));
+  $tr.appendChild(createColumn('Floodgated File Info', 'header'));
   $table.appendChild($tr);
   return $table;
 }
@@ -92,13 +78,15 @@ async function updateProjectDetailsUI(projectDetail, config) {
     return;
   }
 
-  const container = getProjectDetailContainer();
+  const container = document.getElementsByClassName('project-detail')[0];
+  container.innerHTML = '';
+
   const $table = createTableWithHeaders();
   const spViewUrl = config.sp.shareUrl;
   const fgSpViewUrl = config.sp.fgShareUrl;
 
   projectDetail.urls.forEach((urlInfo, url) => {
-    const $tr = createRow();
+    const $tr = createTag('tr');
     const docPath = getPathFromUrl(url);
 
     // Source file data    
