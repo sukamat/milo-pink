@@ -16,7 +16,7 @@ import {
 import {
   updateProjectInfo,
   updateProjectDetailsUI,
-} from './app.js';
+} from './ui.js';
 
 async function reloadProject() {
   loadingON('Purging project file cache and reloading... please wait');

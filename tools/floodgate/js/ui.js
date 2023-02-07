@@ -23,8 +23,7 @@ function createTableWithHeaders() {
   $tr.appendChild(createColumn('Source URL', 'header'));
   $tr.appendChild(createColumn('Source File', 'header'));
   $tr.appendChild(createColumn('Source File Info', 'header'));
-  $tr.appendChild(createColumn('Floodgated URL', 'header'));
-  $tr.appendChild(createColumn('Floodgated File', 'header'));
+  $tr.appendChild(createColumn('Floodgated Content', 'header'));
   $tr.appendChild(createColumn('Floodgated File Info', 'header'));
   $table.appendChild($tr);
   return $table;
@@ -73,6 +72,16 @@ function showButtons(buttonIds) {
   });
 }
 
+function getFloodgatedContentInfoHtml(url, fgSpViewUrl, fgDocStatus) {
+  if (fgDocStatus.hasSourceFile) {
+    const fgPageUrl = getAnchorHtml(getFloodgateUrl(url), 'Url');
+    const fgDocDisplayText = getAnchorHtml(fgSpViewUrl.replace('<relativePath>', fgDocStatus.msg), 'File');
+    return `${fgPageUrl}, ${fgDocDisplayText}`;
+  } else {
+    return fgDocStatus.msg;
+  }
+}
+
 async function updateProjectDetailsUI(projectDetail, config) {
   if (!projectDetail || !config) {
     return;
@@ -98,11 +107,8 @@ async function updateProjectDetailsUI(projectDetail, config) {
     $tr.appendChild(createColumn(usEnDocStatus.modificationInfo));
 
     // Floodgated file data
-    const fgPageUrl = getAnchorHtml(getFloodgateUrl(url), docPath);
-    $tr.appendChild(createColumn(fgPageUrl));
     const fgDocStatus = getSharepointStatus(urlInfo.doc, true);
-    const fgDocDisplayText = getLinkOrDisplayText(fgSpViewUrl, fgDocStatus);
-    $tr.appendChild(createColumn(fgDocDisplayText));
+    $tr.appendChild(createColumn(getFloodgatedContentInfoHtml(url, fgSpViewUrl, fgDocStatus)));
     $tr.appendChild(createColumn(fgDocStatus.modificationInfo));
 
     $table.appendChild($tr);
