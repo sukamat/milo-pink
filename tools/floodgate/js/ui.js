@@ -2,36 +2,11 @@ import {
   createTag,
   getPathFromUrl,
 } from '../../loc/utils.js';
-import { getFloodgateUrl } from './utils.js';
-
-function updateProjectInfo(project) {
-  document.getElementById('project-url').innerHTML = `<a href='${project.sp}' title='${project.excelPath}'>${project.name}</a>`;
-}
-
-function createColumn(innerHtml, classValue) {
-  const tag = classValue === 'header' ? 'th' : 'td';
-  const element = document.createElement(tag);
-  if (innerHtml) {
-    element.innerHTML = innerHtml;
-  }
-  return element;
-}
-
-function createTableWithHeaders() {
-  const $table = createTag('table');
-  const $tr = createTag('tr', { class: 'header' });
-  $tr.appendChild(createColumn('Source URL', 'header'));
-  $tr.appendChild(createColumn('Source File', 'header'));
-  $tr.appendChild(createColumn('Source File Info', 'header'));
-  $tr.appendChild(createColumn('Floodgated Content', 'header'));
-  $tr.appendChild(createColumn('Floodgated File Info', 'header'));
-  $table.appendChild($tr);
-  return $table;
-}
-
-function getAnchorHtml(url, text) {
-  return `<a href="${url}" target="_new">${text}</a>`;
-}
+import {
+  createColumn,
+  getAnchorHtml,
+  getFloodgateUrl
+} from './utils.js';
 
 function getSharepointStatus(doc, isFloodgate) {
   let sharepointStatus = 'Connect to Sharepoint';
@@ -57,6 +32,32 @@ function getSharepointStatus(doc, isFloodgate) {
   return { hasSourceFile, msg: sharepointStatus, modificationInfo };
 }
 
+function updateProjectInfo(project) {
+  document.getElementById('project-url').innerHTML = `<a href='${project.sp}' title='${project.excelPath}'>${project.name}</a>`;
+}
+
+function createTableWithHeaders() {
+  const $table = createTag('table');
+  const $tr = createTag('tr', { class: 'header' });
+  $tr.appendChild(createColumn('Source URL', 'header'));
+  $tr.appendChild(createColumn('Source File', 'header'));
+  $tr.appendChild(createColumn('Source File Info', 'header'));
+  $tr.appendChild(createColumn('Floodgated Content', 'header'));
+  $tr.appendChild(createColumn('Floodgated File Info', 'header'));
+  $table.appendChild($tr);
+  return $table;
+}
+
+function getFloodgatedContentInfoHtml(url, fgSpViewUrl, fgDocStatus) {
+  if (fgDocStatus.hasSourceFile) {
+    const fgPageUrl = getAnchorHtml(getFloodgateUrl(url), 'Url');
+    const fgDocDisplayText = getAnchorHtml(fgSpViewUrl.replace('<relativePath>', fgDocStatus.msg), 'File');
+    return `${fgPageUrl}, ${fgDocDisplayText}`;
+  } else {
+    return fgDocStatus.msg;
+  }
+}
+
 function getLinkedPagePath(spShareUrl, pagePath) {
   return getAnchorHtml(spShareUrl.replace('<relativePath>', pagePath), pagePath);
 }
@@ -70,16 +71,6 @@ function showButtons(buttonIds) {
   buttonIds.forEach((buttonId) => {
     document.getElementById(buttonId).classList.remove('hidden');
   });
-}
-
-function getFloodgatedContentInfoHtml(url, fgSpViewUrl, fgDocStatus) {
-  if (fgDocStatus.hasSourceFile) {
-    const fgPageUrl = getAnchorHtml(getFloodgateUrl(url), 'Url');
-    const fgDocDisplayText = getAnchorHtml(fgSpViewUrl.replace('<relativePath>', fgDocStatus.msg), 'File');
-    return `${fgPageUrl}, ${fgDocDisplayText}`;
-  } else {
-    return fgDocStatus.msg;
-  }
 }
 
 async function updateProjectDetailsUI(projectDetail, config) {
