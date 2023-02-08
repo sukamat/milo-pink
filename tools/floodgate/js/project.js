@@ -131,7 +131,6 @@ async function initProject() {
       });
 
       projectDetail = { url: projectUrl, name: projectName, urls, filePaths, };
-      window.projectDetail = projectDetail;
       return projectDetail;
 
     }
